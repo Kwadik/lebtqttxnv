@@ -14,6 +14,7 @@ use yii\db\ActiveRecord;
  * @property string $author_name
  * @property string $author_email
  * @property string $author_ip
+ * @property string $email_token
  * @property int $created_at
  * @property int|null $deleted_at
  * @property int $updated_at
@@ -109,6 +110,15 @@ class Post extends ActiveRecord
 		}
 		return "$n постов";
 	}
+
+	/**
+	 * Возвращает сгенерированный email_token для поста
+	 */
+	public function generateEmailToken(): string
+	{
+		return md5("email_token|$this->author_email|$this->id");
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

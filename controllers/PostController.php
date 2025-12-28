@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\components\MailerOnPostCreation;
 use app\models\Post;
 use app\models\PostForm;
 use Yii;
@@ -134,6 +135,7 @@ class PostController extends Controller
 				$post->author_name = $form->author_name;
 				$post->author_email = $form->author_email;
 				$post->author_ip = $ip;
+				$post->email_token = $post->generateEmailToken();
 				$post->created_at = time();
 				$post->updated_at = time();
 
@@ -161,22 +163,21 @@ class PostController extends Controller
 
 				$post->save(false);
 
+				MailerOnPostCreation::send($post);
+
 				return json_encode([
 					'success' => true,
-					'field' => 'imageFile',
-					'message' => "Пост $post->id успешно опубликован",
-					'list' => Post::getListProvider(),
-					'debug' => Yii::$app->request->post(),
+					'message' => "История успешно опубликована",
+//					'list' => Post::getListProvider(),
+//					'debug' => Yii::$app->request->post(),
 				]);
 
 			} else {
 				return json_encode([
 					'success' => false,
-					'field' => 'content',
-					'message' => "test",
-					'getErrors' => $form->getErrors(),
+					'message' => implode('/', array_column($form->getErrors(), 'message')),
 				]);
-				throw new HttpException(401, implode('/', array_column($form->getErrors(), 'message')));
+//				throw new HttpException(401, implode('/', array_column($form->getErrors(), 'message')));
 			}
 
         } else {
