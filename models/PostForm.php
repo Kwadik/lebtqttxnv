@@ -16,15 +16,16 @@ use yii\web\UploadedFile;
  * @property string $author_name
  * @property string $author_email
  * @property string $author_ip
- * @property Captcha $captcha
+ * @property Captcha|string|null $captcha
+ * @property UploadedFile|string|null $imageFile
  */
 class PostForm extends Model {
 
-	public string $content;
-	public string $author_name;
-	public string $author_email;
-	public Captcha $captcha;
-	public string $imageFile;
+	public string|null $content = null;
+	public string|null $author_name = null;
+	public string|null $author_email = null;
+	public Captcha|string|null $captcha = null;
+	public UploadedFile|string|null $imageFile = null;
 
 	public function rules() {
 

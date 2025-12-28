@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 
 /**
@@ -19,6 +20,8 @@ use yii\db\ActiveRecord;
  */
 class Post extends ActiveRecord
 {
+
+	public static $listPortionLength = 3;
 
 	/**
 	 * {@inheritdoc}
@@ -85,6 +88,38 @@ class Post extends ActiveRecord
 	public static function find()
 	{
 		return (new PostQuery(get_called_class()))->notDeleted();
+	}
+
+	/**
+	 * Хелпер для вывода количества постов
+	 */
+	public static function pluralQuantity(int $n): string
+	{
+		$n = abs($n) % 100;
+		$n1 = $n % 10;
+
+		if ($n > 10 && $n < 20) {
+			return "$n постов";
+		}
+		if ($n1 > 1 && $n1 < 5) {
+			return "$n поста";
+		}
+		if ($n1 == 1) {
+			return "$n пост";
+		}
+		return "$n постов";
+	}
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function getListProvider()
+	{
+		return new ActiveDataProvider([
+			'query' => self::find()->orderBy(['created_at' => SORT_DESC]),
+			'pagination' => [
+				'pageSize' => self::$listPortionLength,
+			],
+		]);
 	}
 
 	/**

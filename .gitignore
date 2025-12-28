@@ -60,3 +60,4 @@ _README.md
 /runtime/
 /composer.lock
 /tmp/
+/web/uploads/

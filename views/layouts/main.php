@@ -7,6 +7,7 @@ use app\assets\AppAsset;
 use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
+use yii\bootstrap5\Modal;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
@@ -76,6 +77,93 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         </div>
     </div>
 </footer>
+<div id="ajax-loader">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="210"
+         height="210" style="shape-rendering: auto; display: block; background: transparent;"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g>
+            <g transform="rotate(0 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.4774305555555555s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(30 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.43402777777777773s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(60 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.39062499999999994s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(90 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.34722222222222215s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(120 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.3038194444444444s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(150 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.26041666666666663s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(180 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.21701388888888887s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(210 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.17361111111111108s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(240 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.13020833333333331s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(270 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.08680555555555554s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(300 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="-0.04340277777777777s" dur="0.5208333333333333s"
+                             keyTimes="0;1" values="1;0" attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g transform="rotate(330 50 50)">
+                <rect fill="#ffffff" height="14" width="4" ry="4.34" rx="2" y="19" x="48">
+                    <animate repeatCount="indefinite" begin="0s" dur="0.5208333333333333s" keyTimes="0;1" values="1;0"
+                             attributeName="opacity"></animate>
+                </rect>
+            </g>
+            <g></g>
+        </g><!-- [ldio] generated by https://loading.io -->
+    </svg>
+</div>
+<?php Modal::begin([
+	'id' => 'modal-main',
+]); ?>
+<h4 class="modal-main__title"></h4>
+<div class="modal-main__message"></div>
+<?php Modal::end(); ?>
 
 <?php $this->endBody() ?>
 </body>

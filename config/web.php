@@ -58,14 +58,12 @@ $config = [
 			'strategy' => \app\components\PostRateLimiter::STRATEGY_BOTH,
 			'intervalSeconds' => 180,
 		],
-		/*
-		  'urlManager' => [
-			  'enablePrettyUrl' => true,
-			  'showScriptName' => false,
-			  'rules' => [
-			  ],
-		  ],
-		  */
+		'urlManager' => [
+			'enablePrettyUrl' => true,
+			'showScriptName' => false,
+			'rules' => [
+			],
+		],
     ],
     'params' => $params,
 ];
