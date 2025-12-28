@@ -4,7 +4,9 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id' => 'basic',
+	'id' => 'story-valut-app',
+	'name' => 'StoryValut',
+	'language' => 'ru-RU',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -42,14 +44,28 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-            ],
-        ],
-        */
+		'redis' => [
+			'class' => \yii\redis\Connection::class,
+			'hostname' => '127.0.0.1',
+			'port' => 6379,
+			'database' => 0,
+		],
+		'postStats' => [
+			'class' => 'app\components\PostStatsService',
+		],
+		'postLimiter' => [
+			'class' => 'app\components\PostRateLimiter',
+			'strategy' => \app\components\PostRateLimiter::STRATEGY_BOTH,
+			'intervalSeconds' => 180,
+		],
+		/*
+		  'urlManager' => [
+			  'enablePrettyUrl' => true,
+			  'showScriptName' => false,
+			  'rules' => [
+			  ],
+		  ],
+		  */
     ],
     'params' => $params,
 ];
