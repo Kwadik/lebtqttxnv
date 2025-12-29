@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\MailerOnPostCreation;
+use app\components\SoftDeleteBehavior;
 use app\models\Post;
 use app\models\PostForm;
 use Yii;
@@ -31,7 +32,7 @@ class PostController extends Controller
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
-                        'delete' => ['POST'],
+                        'delete' => ['GET','DELETE'],
                     ],
                 ],
             ]
@@ -206,18 +207,75 @@ class PostController extends Controller
     }
 
     /**
-     * Deletes an existing Post model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
+     * Удаление поста. Работает по приватной ссылке из письма с параметром token
+	 *
+	 * [GET] -- выводится страница подтверждения удаления
+	 * [DELETE] -- производится удаление после подтверждения
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+	public function actionDelete()
+	{
+		$time = time();
 
-        return $this->redirect(['index']);
-    }
+		if ($this->request->isGet) {
+
+			$errorMessage = '';
+
+			$token = $this->request->get('token');
+			$model = Post::find()->where([
+				'email_token' => $token,
+			])->one();
+
+			if ($model) {
+
+				if ($time > strtotime('+14 days', intval($model->created_at))) {
+					$errorMessage = 'Удаление поста доступно в течение 14 дней с момента публикации';
+				}
+
+			} else {
+				$errorMessage = 'Недействительная ссылка или пост уже удалён';
+			}
+
+			return $this->render('delete', [
+				'model' => $model,
+				'errorMessage' => $errorMessage,
+			]);
+
+		} elseif ($this->request->isDelete) {
+
+			$errorMessage = '';
+
+			$token = Yii::$app->request->getBodyParam('email_token');
+			$model = Post::find()->where([
+				'email_token' => $token,
+			])->one();
+
+			if ($model) {
+
+				if ($time > strtotime('+14 days', intval($model->created_at))) {
+					$errorMessage = 'Удаление поста доступно в течение 14 дней с момента публикации';
+				} else {
+					$model->delete();
+
+					if (SoftDeleteBehavior::$result === false) {
+						$errorMessage = 'Ошибка удаления';
+					} else {
+						return $this->redirect('/');
+					}
+				}
+
+			} else {
+				$errorMessage = 'Недействительная ссылка или пост уже удалён';
+			}
+
+			return $this->render('delete', [
+				'model' => $model,
+				'errorMessage' => $errorMessage,
+			]);
+
+		} else {
+			throw new MethodNotAllowedHttpException('The request does not allowed.');
+		}
+	}
 
     /**
      * Finds the Post model based on its primary key value.

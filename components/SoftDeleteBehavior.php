@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
 class SoftDeleteBehavior extends Behavior {
 
 	public string $attribute = 'deleted_at';
+	public static $result;
 
 	public function events()
 	{
@@ -24,7 +25,7 @@ class SoftDeleteBehavior extends Behavior {
 	public function softDelete($event)
 	{
 		$this->owner->{$this->attribute} = time();
-		$this->owner->save(false, [$this->attribute]);
+		self::$result = $this->owner->save(false, [$this->attribute]);
 
 		// отменяем физическое удаление
 		$event->isValid = false;
