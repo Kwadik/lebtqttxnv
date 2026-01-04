@@ -3,13 +3,13 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\captcha\Captcha;
-use app\models\PostForm;
+use app\models\PostCreateForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\Post $model */
+/** @var app\models\PostCreateForm $model */
 /** @var yii\widgets\ActiveForm $form */
 
-$model = new PostForm();
+$model = new PostCreateForm();
 
 ?>
 

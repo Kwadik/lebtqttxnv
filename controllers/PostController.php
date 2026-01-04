@@ -5,7 +5,8 @@ namespace app\controllers;
 use app\components\MailerOnPostCreation;
 use app\components\SoftDeleteBehavior;
 use app\models\Post;
-use app\models\PostForm;
+use app\models\PostCreateForm;
+use app\models\PostUpdateForm;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Exception;
@@ -32,7 +33,8 @@ class PostController extends Controller
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
-                        'delete' => ['GET','DELETE'],
+						'update' => ['GET','PUT'],
+						'delete' => ['GET','DELETE'],
                     ],
                 ],
             ]
@@ -66,40 +68,6 @@ class PostController extends Controller
 	}
 
 	/**
-	 * Lists all Post models.
-	 *
-	 * @return string
-	 */
-	public function actionList1()
-	{
-		$query = Post::find()->orderBy(['created_at' => SORT_DESC]);
-
-		$dataProvider = new ActiveDataProvider([
-			'query' => $query,
-			'pagination' => [
-				'pageSize' => Post::$listPortionLength,
-			],
-		]);
-
-		return $this->getView()->render('_postList', [
-			'dataProvider' => $dataProvider,
-		], $this);
-	}
-
-    /**
-     * Displays a single Post model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-	/**
 	 * Обработчик формы создания поста.
 	 *
 	 * @return false|string
@@ -111,7 +79,7 @@ class PostController extends Controller
 
         if ($this->request->isPost) {
 
-			$form = new PostForm();
+			$form = new PostCreateForm();
 
 			if ($form->load(Yii::$app->request->post()) && $form->validate()) {
 
@@ -169,8 +137,6 @@ class PostController extends Controller
 				return json_encode([
 					'success' => true,
 					'message' => "История успешно опубликована",
-//					'list' => Post::getListProvider(),
-//					'debug' => Yii::$app->request->post(),
 				]);
 
 			} else {
@@ -178,7 +144,6 @@ class PostController extends Controller
 					'success' => false,
 					'message' => implode('/', array_column($form->getErrors(), 'message')),
 				]);
-//				throw new HttpException(401, implode('/', array_column($form->getErrors(), 'message')));
 			}
 
         } else {
@@ -187,23 +152,115 @@ class PostController extends Controller
     }
 
     /**
-     * Updates an existing Post model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
+	 * Редактирование поста. Работает по приватной ссылке из письма с параметром token
+	 *
+	 * [GET] -- выводится форма редактирования
+	 * [PUT] -- производится обработка и сохранение
      */
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $model = $this->findModel($id);
+		$time = time();
+		$errorMessage = '';
+		$successMessage = '';
+		$needForm = false;
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+		if ($this->request->isGet) {
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+			$token = $this->request->get('token');
+			$postModel = Post::find()->where([
+				'email_token' => $token,
+			])->one();
+
+			if ($postModel) {
+
+				if ($time > strtotime('+12 hours', intval($postModel->created_at))) {
+					$errorMessage = 'Редактирование поста доступно в течение 12 часов с момента публикации';
+
+					// test
+					$errorMessage = '';
+					$needForm = true;
+
+				} else {
+					$needForm = true;
+				}
+
+			} else {
+				$errorMessage = 'Недействительная ссылка или пост удалён';
+			}
+
+			return $this->render('update', [
+				'postModel' => $postModel,
+				'errorMessage' => $errorMessage,
+				'successMessage' => $successMessage,
+				'needForm' => $needForm,
+			]);
+
+		} elseif ($this->request->isPut) {
+
+			$form = new PostUpdateForm();
+
+			$token = Yii::$app->request->getBodyParam('email_token');
+			$postModel = Post::find()->where([
+				'email_token' => $token,
+			])->one();
+
+			if ($postModel) {
+
+				if ($time > strtotime('+14 days', intval($postModel->created_at)) && false) {
+					$errorMessage = 'Редактирование поста доступно в течение 12 часов с момента публикации';
+				} else {
+
+//					$form->load(Yii::$app->request->getBodyParams());
+//					return json_encode($form->toArray());
+					$needForm = true;
+
+					if ($form->load(Yii::$app->request->getBodyParams()) && $form->validate()) {
+
+						$postModel->content = $form->content;
+						$postModel->updated_at = time();
+
+						// Загружаем файл
+						$form->imageFile = UploadedFile::getInstance($form, 'imageFile');
+
+						// Обработка загрузки изображения
+						if ($form->imageFile) {
+
+							$imgSize = getimagesize($form->imageFile->tempName);
+
+							if (!$imgSize || $imgSize[0] > 1500 || $imgSize[1] > 1500) {
+								$errorMessage = 'Изображение каждой из сторон не должно превышать 1500px';
+							} else {
+
+								$fileName = uniqid('img_') . '.' . $form->imageFile->extension;
+								$uploadPath = Yii::getAlias('@webroot/uploads/' . $fileName);
+
+								$form->imageFile->saveAs($uploadPath);
+								$postModel->image_path = '/uploads/' . $fileName;
+							}
+						}
+
+						$postModel->save(false);
+						$successMessage = 'Редактирование прозошло успешно';
+
+					} else {
+						$errorMessage = 'Редактирование прозошло с ошибками, данные неверны';
+					}
+				}
+
+			} else {
+				$errorMessage = 'Недействительная ссылка или пост удалён';
+			}
+
+			return $this->render('update', [
+				'postModel' => $postModel,
+				'errorMessage' => $errorMessage,
+				'successMessage' => $successMessage,
+				'needForm' => $needForm,
+			]);
+
+		} else {
+			throw new MethodNotAllowedHttpException('The request does not allowed.');
+		}
     }
 
     /**

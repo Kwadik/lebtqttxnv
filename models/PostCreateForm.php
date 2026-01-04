@@ -11,15 +11,13 @@ use yii\web\UploadedFile;
 /**
  * This is the model class for ActiveForm.
  *
- * @property int $id
  * @property string $content
  * @property string $author_name
  * @property string $author_email
- * @property string $author_ip
  * @property Captcha|string|null $captcha
  * @property UploadedFile|string|null $imageFile
  */
-class PostForm extends Model {
+class PostCreateForm extends Model {
 
 	public string|null $content = null;
 	public string|null $author_name = null;

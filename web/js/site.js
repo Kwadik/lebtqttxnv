@@ -39,11 +39,11 @@ $(() => {
 				let modal = $('#modal-main');
 				if(data.success){
 					$([
-						'[name="PostForm[author_name]"]',
-						'[name="PostForm[author_email]"]',
-						'[name="PostForm[content]"]',
-						'[name="PostForm[imageFile]"]',
-						'[name="PostForm[captcha]"]',
+						'[name="PostCreateForm[author_name]"]',
+						'[name="PostCreateForm[author_email]"]',
+						'[name="PostCreateForm[content]"]',
+						'[name="PostCreateForm[imageFile]"]',
+						'[name="PostCreateForm[captcha]"]',
 					].join(', ')).val('');
 					$.pjax.reload({
 						timeout: 5000,
